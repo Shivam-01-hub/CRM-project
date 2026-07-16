@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Partnership CRM
 
 A responsive internal CRM for managing partnerships across universities, founders, mentors, and partner organizations.
@@ -21,3 +22,7 @@ npm run dev
 ```bash
 npm run build
 ```
+=======
+# CRM-project
+A modern CRM web app built with React and Vite to manage university, mentor, and startup relationships efficiently.
+>>>>>>> b804144dd2fb49065a138bbff4a90b793e693f25
