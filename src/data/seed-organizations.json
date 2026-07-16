@@ -1,0 +1,254 @@
+[
+  {
+    "id": "northstar-university",
+    "name": "Northstar University",
+    "type": "University",
+    "stage": "Negotiation",
+    "owner": "Maya",
+    "priority": "High",
+    "health": 86,
+    "website": "northstar.edu",
+    "location": "Boston, MA",
+    "summary": "Campus innovation office exploring a student ambassador program and a spring founder showcase.",
+    "lastTouch": "2026-07-14T00:00:00.000Z",
+    "nextFollowUp": "2026-07-18T00:00:00.000Z",
+    "contacts": [
+      {
+        "name": "Dr. Elena Park",
+        "role": "Director of Innovation",
+        "email": "elena.park@northstar.edu",
+        "phone": "(617) 555-0132",
+        "preferredChannel": "Email",
+        "lastTouch": "2026-07-14T00:00:00.000Z"
+      },
+      {
+        "name": "Jordan Blake",
+        "role": "Programs Manager",
+        "email": "jordan.blake@northstar.edu",
+        "phone": "(617) 555-0188",
+        "preferredChannel": "Slack",
+        "lastTouch": "2026-07-12T00:00:00.000Z"
+      }
+    ],
+    "meetings": [
+      {
+        "id": "meet-northstar-1",
+        "date": "2026-07-07T00:00:00.000Z",
+        "subject": "Discovery call",
+        "outcome": "Aligned on student engagement goals and mutual promotion opportunities.",
+        "nextStep": "Send one-page partnership outline."
+      },
+      {
+        "id": "meet-northstar-2",
+        "date": "2026-07-14T00:00:00.000Z",
+        "subject": "Scope review",
+        "outcome": "Reviewed event format and agreed to loop in legal for sponsorship terms.",
+        "nextStep": "Confirm draft MoU language."
+      }
+    ],
+    "notes": [
+      {
+        "id": "note-northstar-1",
+        "author": "Ava",
+        "body": "Follow-up email sent with sample timeline and student ambassador outline.",
+        "createdAt": "2026-07-14T00:00:00.000Z",
+        "tag": "Follow-up"
+      },
+      {
+        "id": "note-northstar-2",
+        "author": "Maya",
+        "body": "They want a simple co-branded landing page before the end of the month.",
+        "createdAt": "2026-07-13T00:00:00.000Z",
+        "tag": "Requirement"
+      }
+    ],
+    "tags": ["University", "Campus", "Priority"]
+  },
+  {
+    "id": "founder-hub",
+    "name": "Founder Hub",
+    "type": "Startup",
+    "stage": "Proposal",
+    "owner": "Noah",
+    "priority": "High",
+    "health": 74,
+    "website": "founderhub.co",
+    "location": "San Francisco, CA",
+    "summary": "Startup community platform interested in sponsor access, community talks, and referral exchange.",
+    "lastTouch": "2026-07-15T00:00:00.000Z",
+    "nextFollowUp": "2026-07-19T00:00:00.000Z",
+    "contacts": [
+      {
+        "name": "Priya Singh",
+        "role": "Head of Community",
+        "email": "priya@founderhub.co",
+        "phone": "(415) 555-0193",
+        "preferredChannel": "Email",
+        "lastTouch": "2026-07-15T00:00:00.000Z"
+      },
+      {
+        "name": "Theo Grant",
+        "role": "CEO",
+        "email": "theo@founderhub.co",
+        "phone": "(415) 555-0114",
+        "preferredChannel": "Phone",
+        "lastTouch": "2026-07-10T00:00:00.000Z"
+      }
+    ],
+    "meetings": [
+      {
+        "id": "meet-founderhub-1",
+        "date": "2026-07-06T00:00:00.000Z",
+        "subject": "Intro conversation",
+        "outcome": "Strong excitement around shared audience growth and office hours.",
+        "nextStep": "Send partnership tiers."
+      },
+      {
+        "id": "meet-founderhub-2",
+        "date": "2026-07-15T00:00:00.000Z",
+        "subject": "Proposal review",
+        "outcome": "Requested more detail on speaker swap and newsletter inclusion.",
+        "nextStep": "Update proposal with three activation ideas."
+      }
+    ],
+    "notes": [
+      {
+        "id": "note-founderhub-1",
+        "author": "Noah",
+        "body": "Proposal draft is in good shape, but they want metrics from last quarter.",
+        "createdAt": "2026-07-15T00:00:00.000Z",
+        "tag": "Proposal"
+      }
+    ],
+    "tags": ["Startup", "Community", "Co-marketing"]
+  },
+  {
+    "id": "mentor-loop",
+    "name": "Mentor Loop",
+    "type": "Mentor",
+    "stage": "Active",
+    "owner": "Iris",
+    "priority": "Medium",
+    "health": 91,
+    "website": "mentorloop.org",
+    "location": "Austin, TX",
+    "summary": "Mentor network already hosting monthly office hours and warm introductions for startup partners.",
+    "lastTouch": "2026-07-11T00:00:00.000Z",
+    "nextFollowUp": "2026-07-23T00:00:00.000Z",
+    "contacts": [
+      {
+        "name": "Lena Torres",
+        "role": "Program Lead",
+        "email": "lena@mentorloop.org",
+        "phone": "(512) 555-0161",
+        "preferredChannel": "Text",
+        "lastTouch": "2026-07-11T00:00:00.000Z"
+      }
+    ],
+    "meetings": [
+      {
+        "id": "meet-mentorloop-1",
+        "date": "2026-07-04T00:00:00.000Z",
+        "subject": "Quarterly planning",
+        "outcome": "Confirmed office hours and two founder roundtables.",
+        "nextStep": "Publish the Q3 calendar."
+      }
+    ],
+    "notes": [
+      {
+        "id": "note-mentorloop-1",
+        "author": "Iris",
+        "body": "Keep this relationship warm with a monthly update and a handwritten note.",
+        "createdAt": "2026-07-11T00:00:00.000Z",
+        "tag": "Relationship"
+      }
+    ],
+    "tags": ["Mentor", "Warm intro", "Active"]
+  },
+  {
+    "id": "spark-labs",
+    "name": "Spark Labs",
+    "type": "Partner",
+    "stage": "Discovery",
+    "owner": "Ethan",
+    "priority": "Medium",
+    "health": 63,
+    "website": "sparklabs.io",
+    "location": "New York, NY",
+    "summary": "Potential partner for a shared demo day and cross-promo package with aligned startup audiences.",
+    "lastTouch": "2026-07-12T00:00:00.000Z",
+    "nextFollowUp": "2026-07-17T00:00:00.000Z",
+    "contacts": [
+      {
+        "name": "Mina Rodriguez",
+        "role": "Partnerships",
+        "email": "mina@sparklabs.io",
+        "phone": "(212) 555-0140",
+        "preferredChannel": "Email",
+        "lastTouch": "2026-07-12T00:00:00.000Z"
+      }
+    ],
+    "meetings": [
+      {
+        "id": "meet-sparklabs-1",
+        "date": "2026-07-12T00:00:00.000Z",
+        "subject": "Warm intro",
+        "outcome": "Expressed interest but needs a cleaner view of target audience overlap.",
+        "nextStep": "Share partner one-pager."
+      }
+    ],
+    "notes": [
+      {
+        "id": "note-sparklabs-1",
+        "author": "Ethan",
+        "body": "Need to map their event calendar against our Q3 launch window.",
+        "createdAt": "2026-07-12T00:00:00.000Z",
+        "tag": "Research"
+      }
+    ],
+    "tags": ["Partner", "Event", "Exploration"]
+  },
+  {
+    "id": "greenline-collective",
+    "name": "Greenline Collective",
+    "type": "Partner",
+    "stage": "Qualified",
+    "owner": "Sofia",
+    "priority": "Low",
+    "health": 69,
+    "website": "greenlinecollective.com",
+    "location": "Seattle, WA",
+    "summary": "Operations-heavy organization open to structured collaboration around sustainability programming.",
+    "lastTouch": "2026-07-10T00:00:00.000Z",
+    "nextFollowUp": "2026-07-21T00:00:00.000Z",
+    "contacts": [
+      {
+        "name": "Renee Moss",
+        "role": "Operations Director",
+        "email": "renee@greenlinecollective.com",
+        "phone": "(206) 555-0129",
+        "preferredChannel": "Email",
+        "lastTouch": "2026-07-10T00:00:00.000Z"
+      }
+    ],
+    "meetings": [
+      {
+        "id": "meet-greenline-1",
+        "date": "2026-07-10T00:00:00.000Z",
+        "subject": "Qualification call",
+        "outcome": "Needs a clear mutual-value statement before advancing.",
+        "nextStep": "Draft success metrics and pilot concept."
+      }
+    ],
+    "notes": [
+      {
+        "id": "note-greenline-1",
+        "author": "Sofia",
+        "body": "Good fit, but the ask needs to be tighter and less operationally heavy.",
+        "createdAt": "2026-07-10T00:00:00.000Z",
+        "tag": "Assessment"
+      }
+    ],
+    "tags": ["Partner", "Sustainability", "Pilot"]
+  }
+]

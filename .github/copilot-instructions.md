@@ -1,0 +1,4 @@
+- Partnership CRM workspace for a React + Vite + TypeScript app.
+- Keep changes focused on organizations, contacts, meetings, notes, follow-ups, and stage management.
+- Prefer responsive, polished UI updates and maintainable code.
+- Check package.json and README.md before changing build or run instructions.
