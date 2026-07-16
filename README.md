@@ -25,4 +25,7 @@ npm run build
 =======
 # CRM-project
 A modern CRM web app built with React and Vite to manage university, mentor, and startup relationships efficiently.
->>>>>>> b804144dd2fb49065a138bbff4a90b793e693f25
+# CRM Project
+React + Vite based CRM dashboard to manage universities, startups, and mentors.
+
+>>>>>>> 
