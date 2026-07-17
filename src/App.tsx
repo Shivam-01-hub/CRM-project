@@ -1,5 +1,7 @@
 import { type FormEvent, useEffect, useMemo, useState } from 'react';
 import seedOrganizationsData from './data/seed-organizations.json';
+import DashboardHeader from './components/DashboardHeader';
+import Sidebar from './components/Sidebar';
 
 type PartnershipStage = 'Discovery' | 'Qualified' | 'Proposal' | 'Negotiation' | 'Active';
 type OrganizationType = 'University' | 'Startup' | 'Mentor' | 'Partner';
@@ -205,8 +207,9 @@ function App() {
     const activePartners = organizations.filter((organization) => organization.stage === 'Active').length;
     const conversations = organizations.reduce((count, organization) => count + organization.meetings.length, 0);
     const notes = organizations.reduce((count, organization) => count + organization.notes.length, 0);
+    const averageHealth = organizations.reduce((sum, organization) => sum + organization.health, 0) / organizations.length;
 
-    return { followUpsDue, activePartners, conversations, notes };
+    return { followUpsDue, activePartners, conversations, notes, averageHealth };
   }, [organizations]);
 
   const stageCounts = useMemo(
@@ -474,127 +477,28 @@ function App() {
 
   return (
     <div className="app-shell">
-      <aside className="sidebar">
-        <div>
-          <div className="brand-row">
-            <div className="brand-mark">P</div>
-            <div>
-              <p className="eyebrow">Internal CRM</p>
-              <h1>Partnership OS</h1>
-            </div>
-          </div>
-          <p className="sidebar-copy">
-            Keep every university, mentor, startup founder, and partner in one disciplined operating system.
-          </p>
-        </div>
-
-        <section className="sidebar-card hero-card">
-          <div className="hero-metric">
-            <strong>{stats.followUpsDue}</strong>
-            <span>follow-ups due in the next 7 days</span>
-          </div>
-          <div className="hero-split">
-            <div>
-              <strong>{stats.activePartners}</strong>
-              <span>active relationships</span>
-            </div>
-            <div>
-              <strong>{stats.conversations}</strong>
-              <span>meetings logged</span>
-            </div>
-          </div>
-        </section>
-
-        <section className="sidebar-card">
-          <div className="card-header compact">
-            <h2>Stage Mix</h2>
-            <span>{organizations.length} accounts</span>
-          </div>
-          <div className="stage-list">
-            {stageCounts.map((entry) => (
-              <button
-                className={`stage-row ${stageFilter === entry.stage ? 'active' : ''}`}
-                key={entry.stage}
-                type="button"
-                onClick={() => setStageFilter(entry.stage)}
-              >
-                <span className="stage-dot" style={{ background: stagePalette[entry.stage] }} />
-                <span>{entry.stage}</span>
-                <strong>{entry.count}</strong>
-              </button>
-            ))}
-            <button className={`stage-row ${stageFilter === 'All' ? 'active' : ''}`} type="button" onClick={() => setStageFilter('All')}>
-              <span className="stage-dot all" />
-              <span>All stages</span>
-              <strong>{organizations.length}</strong>
-            </button>
-          </div>
-        </section>
-
-        <section className="sidebar-card">
-          <div className="card-header compact">
-            <h2>Reminder Queue</h2>
-            <span>{followUpQueue.length} soon</span>
-          </div>
-          <div className="queue-list">
-            {followUpQueue.slice(0, 4).map((organization) => (
-              <button key={organization.id} type="button" className="queue-item" onClick={() => setSelectedId(organization.id)}>
-                <div>
-                  <strong>{organization.name}</strong>
-                  <p>{organization.reminderMessage}</p>
-                </div>
-                <span>{formatDate(organization.nextFollowUp)}</span>
-              </button>
-            ))}
-          </div>
-        </section>
-      </aside>
+      <Sidebar
+        stats={stats}
+        stageCounts={stageCounts}
+        stageFilter={stageFilter}
+        totalOrganizations={organizations.length}
+        followUpQueue={followUpQueue}
+        stagePalette={stagePalette}
+        onStageFilterChange={setStageFilter}
+        onSelectOrganization={setSelectedId}
+        formatDate={formatDate}
+      />
 
       <main className="workspace">
-        <header className="topbar">
-          <div>
-            <p className="eyebrow">Startup partnership team</p>
-            <h2>Track relationships, not spreadsheets.</h2>
-            <p className="subtle-copy">
-              Search conversations, inspect the pipeline, and keep next steps visible for the whole team.
-            </p>
-          </div>
-          <div className="search-panel">
-            <label>
-              <span>Search organizations</span>
-              <input
-                aria-label="Search organizations"
-                placeholder="University, founder, mentor, or partner"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-              />
-            </label>
-            <div className="filter-pill">Filter: {stageFilter}</div>
-          </div>
-        </header>
-
-        <section className="stats-grid">
-          <article className="metric-card">
-            <span>Follow-up risk</span>
-            <strong>{stats.followUpsDue}</strong>
-            <p>Relationships with actions due now or within the week.</p>
-          </article>
-          <article className="metric-card">
-            <span>Partner health</span>
-            <strong>{Math.round(organizations.reduce((sum, organization) => sum + organization.health, 0) / organizations.length)}%</strong>
-            <p>Average relationship score across the active pipeline.</p>
-          </article>
-          <article className="metric-card">
-            <span>Meetings logged</span>
-            <strong>{stats.conversations}</strong>
-            <p>Conversations captured with context and next steps.</p>
-          </article>
-          <article className="metric-card">
-            <span>Notes captured</span>
-            <strong>{stats.notes}</strong>
-            <p>Decision history available for every relationship.</p>
-          </article>
-        </section>
+        <DashboardHeader
+          search={search}
+          stageFilter={stageFilter}
+          followUpsDue={stats.followUpsDue}
+          conversations={stats.conversations}
+          notes={stats.notes}
+          averageHealth={stats.averageHealth}
+          onSearchChange={setSearch}
+        />
 
         <section className="content-grid">
           <div className="left-column">
