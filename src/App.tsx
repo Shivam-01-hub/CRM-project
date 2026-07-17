@@ -1,7 +1,9 @@
 import { type FormEvent, useEffect, useMemo, useState } from 'react';
 import seedOrganizationsData from './data/seed-organizations.json';
+import AuthScreen from './components/AuthScreen';
 import DashboardHeader from './components/DashboardHeader';
 import Sidebar from './components/Sidebar';
+import { apiRequest } from './lib/api';
 
 type PartnershipStage = 'Discovery' | 'Qualified' | 'Proposal' | 'Negotiation' | 'Active';
 type OrganizationType = 'University' | 'Startup' | 'Mentor' | 'Partner';
@@ -100,6 +102,21 @@ const createId = () => (typeof crypto !== 'undefined' && 'randomUUID' in crypto 
 const today = new Date().toISOString();
 
 const storageKey = 'partnership-crm-organizations-v2';
+const authStorageKey = 'partnership-crm-access-token';
+
+type AuthMode = 'login' | 'signup';
+
+type AuthSession = {
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'user';
+};
+
+type AuthResponse = {
+  user: AuthSession;
+  accessToken: string;
+};
 
 type SeedOrganization = Omit<Organization, 'reminderDate' | 'reminderMessage' | 'reminderStatus'>;
 
@@ -129,6 +146,21 @@ const createDefaultNewPartnerDraft = (): NewPartnerDraft => ({
 });
 
 function App() {
+  const [authMode, setAuthMode] = useState<AuthMode>('login');
+  const [authName, setAuthName] = useState('');
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authError, setAuthError] = useState('');
+  const [authToken, setAuthToken] = useState<string | null>(() => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    return window.localStorage.getItem(authStorageKey);
+  });
+  const [authUser, setAuthUser] = useState<AuthSession | null>(null);
+
   const [organizations, setOrganizations] = useState<Organization[]>(() => {
     if (typeof window === 'undefined') {
       return seedOrganizations;
@@ -153,6 +185,93 @@ function App() {
   const [reminderDateDraft, setReminderDateDraft] = useState(toDateInputValue(seedOrganizations[0].reminderDate));
   const [reminderMessageDraft, setReminderMessageDraft] = useState(seedOrganizations[0].reminderMessage);
   const [newPartnerDraft, setNewPartnerDraft] = useState<NewPartnerDraft>(createDefaultNewPartnerDraft);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const restoreSession = async () => {
+      if (!authToken) {
+        setAuthUser(null);
+        setAuthLoading(false);
+        return;
+      }
+
+      try {
+        const response = await apiRequest<{ user: AuthSession }>('/auth/me', {
+          method: 'GET',
+          accessToken: authToken,
+        });
+
+        if (!cancelled) {
+          setAuthUser(response.user);
+          setAuthError('');
+        }
+      } catch {
+        if (!cancelled) {
+          window.localStorage.removeItem(authStorageKey);
+          setAuthToken(null);
+          setAuthUser(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setAuthLoading(false);
+        }
+      }
+    };
+
+    void restoreSession();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authToken]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    if (authToken) {
+      window.localStorage.setItem(authStorageKey, authToken);
+    } else {
+      window.localStorage.removeItem(authStorageKey);
+    }
+  }, [authToken]);
+
+  const handleSignOut = () => {
+    setAuthToken(null);
+    setAuthUser(null);
+    setAuthError('');
+    setAuthPassword('');
+  };
+
+  const handleAuthSubmit = async () => {
+    setAuthLoading(true);
+    setAuthError('');
+
+    try {
+      const payload =
+        authMode === 'signup'
+          ? { name: authName.trim(), email: authEmail.trim(), password: authPassword }
+          : { email: authEmail.trim(), password: authPassword };
+
+      const response = await apiRequest<AuthResponse>(authMode === 'signup' ? '/auth/signup' : '/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+
+      setAuthUser(response.user);
+      setAuthToken(response.accessToken);
+      setAuthPassword('');
+      if (authMode === 'signup') {
+        setAuthName('');
+      }
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : 'Authentication failed');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
 
   const selectedOrganization = useMemo(
     () => organizations.find((organization) => organization.id === selectedId) ?? organizations[0],
@@ -475,6 +594,36 @@ function App() {
     }));
   };
 
+  if (authLoading) {
+    return (
+      <main className="auth-shell">
+        <section className="auth-card">
+          <p className="eyebrow">Partnership CRM</p>
+          <h1>Checking your session...</h1>
+          <p>Restoring the authenticated workspace.</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (!authUser) {
+    return (
+      <AuthScreen
+        mode={authMode}
+        name={authName}
+        email={authEmail}
+        password={authPassword}
+        loading={authLoading}
+        error={authError}
+        onModeChange={setAuthMode}
+        onNameChange={setAuthName}
+        onEmailChange={setAuthEmail}
+        onPasswordChange={setAuthPassword}
+        onSubmit={() => void handleAuthSubmit()}
+      />
+    );
+  }
+
   return (
     <div className="app-shell">
       <Sidebar
@@ -497,7 +646,10 @@ function App() {
           conversations={stats.conversations}
           notes={stats.notes}
           averageHealth={stats.averageHealth}
+          userName={authUser.name}
+          userRole={authUser.role}
           onSearchChange={setSearch}
+          onSignOut={handleSignOut}
         />
 
         <section className="content-grid">

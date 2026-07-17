@@ -5,7 +5,10 @@ type DashboardHeaderProps = {
   conversations: number;
   notes: number;
   averageHealth: number;
+  userName: string;
+  userRole: 'admin' | 'user';
   onSearchChange: (value: string) => void;
+  onSignOut: () => void;
 };
 
 function DashboardHeader({
@@ -15,7 +18,10 @@ function DashboardHeader({
   conversations,
   notes,
   averageHealth,
+  userName,
+  userRole,
   onSearchChange,
+  onSignOut,
 }: DashboardHeaderProps) {
   return (
     <>
@@ -26,6 +32,14 @@ function DashboardHeader({
           <p className="subtle-copy">Search conversations, inspect the pipeline, and keep next steps visible for the whole team.</p>
         </div>
         <div className="search-panel">
+          <div className="account-chip">
+            <span>
+              {userName} · {userRole}
+            </span>
+            <button type="button" className="secondary-button" onClick={onSignOut}>
+              Sign out
+            </button>
+          </div>
           <label>
             <span>Search organizations</span>
             <input

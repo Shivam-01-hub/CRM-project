@@ -37,7 +37,25 @@ npm run preview
 - Seed data lives in `src/data/seed-organizations.json`
 - App state persists in `localStorage`
 - The main dashboard is split into reusable sidebar and header components under `src/components/`
+- The backend scaffold lives in `backend/` and is set up for Express, JWT auth, Prisma, and PostgreSQL
 
 ## Next steps
 
 The app is a strong frontend prototype. The most important production upgrade is to add authentication, a database, and deployment so the CRM becomes a real multi-user product.
+
+### Recommended stack
+
+- Authentication: JWT login and signup
+- Database: PostgreSQL
+- Backend API: Node.js + Express
+- Frontend deployment: Vercel
+- Backend deployment: Render
+- Database hosting: Managed Postgres
+
+### Production phases
+
+1. Add auth and user roles so admins and standard users can access different CRM data.
+2. Move organizations, contacts, meetings, notes, and reminders into PostgreSQL.
+3. Expose REST endpoints for search, filtering, CRUD, and reminder workflows.
+4. Add email or push reminders from the backend.
+5. Deploy frontend and backend separately with environment-specific configuration.

@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  admin
+  user
+}
+
+enum OrganizationType {
+  University
+  Startup
+  Mentor
+  Partner
+}
+
+enum PartnershipStage {
+  Discovery
+  Qualified
+  Proposal
+  Negotiation
+  Active
+}
+
+enum Priority {
+  High
+  Medium
+  Low
+}
+
+enum ReminderStatus {
+  Open
+  Done
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(user)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  organizations Organization[] @relation("OrganizationOwner")
+}
+
+model Organization {
+  id            String            @id @default(cuid())
+  name          String
+  type          OrganizationType
+  stage         PartnershipStage
+  ownerId       String
+  owner         User              @relation("OrganizationOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  priority      Priority
+  health        Int
+  website       String
+  location      String
+  summary       String
+  lastTouch     DateTime
+  nextFollowUp  DateTime
+  reminderDate  DateTime
+  reminderMessage String
+  reminderStatus ReminderStatus   @default(Open)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  contacts      Contact[]
+  meetings      Meeting[]
+  notes         Note[]
+  tags          OrganizationTag[]
+}
+
+model Contact {
+  id                String       @id @default(cuid())
+  organizationId    String
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name              String
+  role              String
+  email             String
+  phone             String
+  preferredChannel   String
+  lastTouch         DateTime
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+}
+
+model Meeting {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  date           DateTime
+  subject        String
+  outcome        String
+  nextStep       String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Note {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  author         String
+  body           String
+  tag            String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  editedAt       DateTime?
+}
+
+model OrganizationTag {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  value          String
+  createdAt      DateTime     @default(now())
+
+  @@index([organizationId, value])
+}
