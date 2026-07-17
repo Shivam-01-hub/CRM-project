@@ -13,7 +13,7 @@ const credentialsSchema = z.object({
 
 function signAccessToken(user: { id: string; email: string; role: 'admin' | 'user' }) {
   return jwt.sign({ userId: user.id, email: user.email, role: user.role }, env.JWT_ACCESS_SECRET, {
-    expiresIn: env.JWT_ACCESS_TTL,
+    expiresIn: env.JWT_ACCESS_TTL as jwt.SignOptions['expiresIn'],
   });
 }
 
