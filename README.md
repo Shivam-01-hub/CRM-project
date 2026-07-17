@@ -61,3 +61,12 @@ The app is a strong frontend prototype. The most important production upgrade is
 3. Expose REST endpoints for search, filtering, CRUD, and reminder workflows.
 4. Add email or push reminders from the backend.
 5. Deploy frontend and backend separately with environment-specific configuration.
+
+## Local run order
+
+1. Start PostgreSQL and create the `partnership_crm` database.
+2. Copy `backend/.env.example` to `backend/.env` and set `DATABASE_URL`, `JWT_ACCESS_SECRET`, and `CORS_ORIGIN`.
+3. Run `npm run dev` inside `backend/`.
+4. Run `npm run dev` in the project root.
+
+If authentication returns a 500, check the backend terminal first. The server now fails fast when PostgreSQL is unavailable or the `DATABASE_URL` is wrong.

@@ -32,3 +32,5 @@ npm run dev
 ```
 
 The frontend calls `/api` during local development, and Vite proxies those requests to this backend on port `4000`.
+
+Make sure PostgreSQL is running before starting the server. The API checks the database connection at boot and exits early if `DATABASE_URL` is wrong or the database is offline.

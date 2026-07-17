@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
@@ -17,71 +18,98 @@ function signAccessToken(user: { id: string; email: string; role: 'admin' | 'use
   });
 }
 
+function isDatabaseError(error: unknown) {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError ||
+    error instanceof Prisma.PrismaClientInitializationError ||
+    error instanceof Prisma.PrismaClientRustPanicError
+  );
+}
+
+function handleAuthError(response: Parameters<typeof authRouter.post>[1] extends (...args: infer Arguments) => unknown ? Arguments[1] : never, error: unknown) {
+  if (isDatabaseError(error)) {
+    return response.status(503).json({
+      message: 'Database unavailable. Check PostgreSQL, DATABASE_URL, and Prisma migrations.',
+    });
+  }
+
+  console.error(error);
+  return response.status(500).json({ message: 'Internal server error' });
+}
+
 export const authRouter = Router();
 
 authRouter.post('/signup', async (request, response) => {
-  const parsed = credentialsSchema.safeParse(request.body);
+  try {
+    const parsed = credentialsSchema.safeParse(request.body);
 
-  if (!parsed.success) {
-    return response.status(400).json({ message: 'Invalid signup payload', issues: parsed.error.flatten() });
+    if (!parsed.success) {
+      return response.status(400).json({ message: 'Invalid signup payload', issues: parsed.error.flatten() });
+    }
+
+    const existingUser = await prisma.user.findUnique({ where: { email: parsed.data.email } });
+    if (existingUser) {
+      return response.status(409).json({ message: 'Email is already registered' });
+    }
+
+    const passwordHash = await bcrypt.hash(parsed.data.password, 12);
+    const user = await prisma.user.create({
+      data: {
+        name: parsed.data.name?.trim() || 'New user',
+        email: parsed.data.email,
+        passwordHash,
+        role: 'user',
+      },
+    });
+
+    const accessToken = signAccessToken(user);
+
+    response.status(201).json({
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      accessToken,
+    });
+  } catch (error) {
+    return handleAuthError(response, error);
   }
-
-  const existingUser = await prisma.user.findUnique({ where: { email: parsed.data.email } });
-  if (existingUser) {
-    return response.status(409).json({ message: 'Email is already registered' });
-  }
-
-  const passwordHash = await bcrypt.hash(parsed.data.password, 12);
-  const user = await prisma.user.create({
-    data: {
-      name: parsed.data.name?.trim() || 'New user',
-      email: parsed.data.email,
-      passwordHash,
-      role: 'user',
-    },
-  });
-
-  const accessToken = signAccessToken(user);
-
-  response.status(201).json({
-    user: { id: user.id, name: user.name, email: user.email, role: user.role },
-    accessToken,
-  });
 });
 
 authRouter.post('/login', async (request, response) => {
-  const parsed = credentialsSchema.omit({ name: true }).safeParse(request.body);
+  try {
+    const parsed = credentialsSchema.omit({ name: true }).safeParse(request.body);
 
-  if (!parsed.success) {
-    return response.status(400).json({ message: 'Invalid login payload', issues: parsed.error.flatten() });
+    if (!parsed.success) {
+      return response.status(400).json({ message: 'Invalid login payload', issues: parsed.error.flatten() });
+    }
+
+    const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
+
+    if (!user) {
+      return response.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    const passwordMatches = await bcrypt.compare(parsed.data.password, user.passwordHash);
+    if (!passwordMatches) {
+      return response.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    const accessToken = signAccessToken(user);
+
+    response.json({
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      accessToken,
+    });
+  } catch (error) {
+    return handleAuthError(response, error);
   }
-
-  const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
-
-  if (!user) {
-    return response.status(401).json({ message: 'Invalid email or password' });
-  }
-
-  const passwordMatches = await bcrypt.compare(parsed.data.password, user.passwordHash);
-  if (!passwordMatches) {
-    return response.status(401).json({ message: 'Invalid email or password' });
-  }
-
-  const accessToken = signAccessToken(user);
-
-  response.json({
-    user: { id: user.id, name: user.name, email: user.email, role: user.role },
-    accessToken,
-  });
 });
 
 authRouter.get('/me', async (request, response) => {
-  const header = request.headers.authorization;
-  if (!header?.startsWith('Bearer ')) {
-    return response.status(401).json({ message: 'Missing access token' });
-  }
-
   try {
+    const header = request.headers.authorization;
+    if (!header?.startsWith('Bearer ')) {
+      return response.status(401).json({ message: 'Missing access token' });
+    }
+
     const payload = jwt.verify(header.slice('Bearer '.length), env.JWT_ACCESS_SECRET) as { userId: string };
     const user = await prisma.user.findUnique({ where: { id: payload.userId } });
 
@@ -90,7 +118,11 @@ authRouter.get('/me', async (request, response) => {
     }
 
     response.json({ user: { id: user.id, name: user.name, email: user.email, role: user.role } });
-  } catch {
-    response.status(401).json({ message: 'Invalid or expired token' });
+  } catch (error) {
+    if (error instanceof jwt.JsonWebTokenError || error instanceof jwt.TokenExpiredError) {
+      return response.status(401).json({ message: 'Invalid or expired token' });
+    }
+
+    return handleAuthError(response, error);
   }
 });
