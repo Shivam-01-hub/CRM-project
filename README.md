@@ -24,6 +24,8 @@ npm install
 npm run dev
 ```
 
+Frontend auth requests use `/api` in local development, and Vite proxies that to the backend on port `4000`. For production, set `VITE_API_URL` to your deployed backend URL.
+
 ## Scripts
 
 ```bash

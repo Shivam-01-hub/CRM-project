@@ -22,3 +22,13 @@ npm run prisma:migrate
 ## Environment
 
 Copy `.env.example` to `.env` and set your production values.
+
+## Local development
+
+Run the backend with:
+
+```bash
+npm run dev
+```
+
+The frontend calls `/api` during local development, and Vite proxies those requests to this backend on port `4000`.

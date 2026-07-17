@@ -2,7 +2,7 @@ type ApiRequestOptions = RequestInit & {
   accessToken?: string;
 };
 
-const defaultApiUrl = 'http://localhost:4000';
+const defaultApiUrl = '/api';
 
 function getApiBaseUrl() {
   return import.meta.env.VITE_API_URL?.trim() || defaultApiUrl;

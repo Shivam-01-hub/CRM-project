@@ -1,15 +1,22 @@
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
+import { env } from '../config/env.js';
 import { authRouter } from '../routes/auth.js';
 import { organizationRouter } from '../routes/organizations.js';
 import { reminderRouter } from '../routes/reminders.js';
 
 export function createApp() {
   const app = express();
+  const allowedOrigins = env.CORS_ORIGIN.split(',').map((origin: string) => origin.trim()).filter(Boolean);
 
   app.use(helmet());
-  app.use(cors({ origin: true, credentials: true }));
+  app.use(
+    cors({
+      origin: allowedOrigins,
+      credentials: true,
+    }),
+  );
   app.use(express.json());
 
   app.get('/health', (_request, response) => {
