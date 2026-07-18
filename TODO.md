@@ -1,0 +1,6 @@
+- [x] Collect failing endpoint details (which request returns 500)
+- [x] Add explicit runtime checks/logging in backend auth.ts for missing/empty JWT_ACCESS_SECRET
+- [x] Improve auth error responses to distinguish JWT misconfig (500 -> 500 with actionable message)
+- [x] Add minimal error logging to include stack for unexpected 500s
+- [x] Run backend (npm run dev) and reproduce request
+- [x] Confirm 500 resolved and response returns expected auth payload
