@@ -8,19 +8,26 @@ export type AuthUser = {
   email: string;
 };
 
+import { ApiError } from '../lib/api-errors.js';
+import { tokenSecretMissing } from '../lib/api-errors.js';
+
 export function requireAuth(request: Request, response: Response, next: NextFunction) {
   const header = request.headers.authorization;
 
   if (!header?.startsWith('Bearer ')) {
-    return response.status(401).json({ message: 'Missing access token' });
+    return next(new ApiError({ status: 401, code: 'UNAUTHORIZED', message: 'Missing access token' }));
   }
 
   const token = header.slice('Bearer '.length);
 
   try {
+    if (!env.JWT_ACCESS_SECRET) {
+      return next(tokenSecretMissing());
+    }
     request.user = jwt.verify(token, env.JWT_ACCESS_SECRET) as AuthUser;
     next();
   } catch {
-    response.status(401).json({ message: 'Invalid or expired token' });
+    return next(new ApiError({ status: 401, code: 'UNAUTHORIZED', message: 'Invalid or expired token' }));
   }
 }
+

@@ -5,6 +5,7 @@ import { env } from '../config/env.js';
 import { authRouter } from '../routes/auth.js';
 import { organizationRouter } from '../routes/organizations.js';
 import { reminderRouter } from '../routes/reminders.js';
+import { errorHandler } from '../middleware/error-handler.js';
 
 export function createApp() {
   const app = express();
@@ -28,8 +29,11 @@ export function createApp() {
   app.use('/reminders', reminderRouter);
 
   app.use((_request, response) => {
-    response.status(404).json({ message: 'Route not found' });
+    response.status(404).json({ message: 'Route not found', code: 'NOT_FOUND' });
   });
+
+  // Central error handler (must be registered after routes)
+  app.use(errorHandler);
 
   return app;
 }

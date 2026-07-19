@@ -107,14 +107,23 @@ authRouter.post('/signup', async (request, response) => {
       return response.status(500).json({
         message:
           'JWT_ACCESS_SECRET is not configured on the backend. Set JWT_ACCESS_SECRET in .env and restart the server.',
+        code: 'TOKEN_SECRET_MISSING',
+        details: { envVar: 'JWT_ACCESS_SECRET' },
       });
+
     }
+
 
     const parsed = credentialsSchema.safeParse(request.body);
 
     if (!parsed.success) {
-      return response.status(400).json({ message: 'Invalid signup payload', issues: parsed.error.flatten() });
+      return response.status(400).json({
+        message: 'Invalid signup payload',
+        code: 'VALIDATION_ERROR',
+        details: parsed.error.flatten(),
+      });
     }
+
 
     const existingUser = await getUserByEmail(parsed.data.email);
     if (existingUser) {
@@ -139,14 +148,19 @@ authRouter.post('/signup', async (request, response) => {
     if (authError.databaseUnavailable) {
       return response.status(503).json({
         message: 'Database unavailable. Check PostgreSQL, DATABASE_URL, and Prisma migrations.',
+        code: 'DATABASE_UNAVAILABLE',
       });
     }
 
+
     if (error instanceof Error && error.message === 'JWT_ACCESS_SECRET is not configured') {
       return response.status(500).json({
-        message: 'JWT_ACCESS_SECRET is not configured on the backend. Set JWT_ACCESS_SECRET in .env and restart the server.',
+        message:
+          'JWT_ACCESS_SECRET is not configured on the backend. Set JWT_ACCESS_SECRET in .env and restart the server.',
+        code: 'TOKEN_SECRET_MISSING',
       });
     }
+
 
     console.error(error);
     return response.status(500).json({ message: 'Internal server error' });
@@ -159,14 +173,21 @@ authRouter.post('/login', async (request, response) => {
       return response.status(500).json({
         message:
           'JWT_ACCESS_SECRET is not configured on the backend. Set JWT_ACCESS_SECRET in .env and restart the server.',
+        code: 'TOKEN_SECRET_MISSING',
       });
     }
+
 
     const parsed = credentialsSchema.omit({ name: true }).safeParse(request.body);
 
     if (!parsed.success) {
-      return response.status(400).json({ message: 'Invalid login payload', issues: parsed.error.flatten() });
+      return response.status(400).json({
+        message: 'Invalid login payload',
+        code: 'VALIDATION_ERROR',
+        details: parsed.error.flatten(),
+      });
     }
+
 
     const user = await getUserByEmail(parsed.data.email);
 
