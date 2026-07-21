@@ -1,28 +1,29 @@
 # Progress Tracker
 
-## Step 1: Clean up project structure
-- [x] Remove redundant `frontend/` directory (already gone, added to .gitignore)
+## Step 1: Fix Prisma Client for Hot-Reload Safety
+- [x] Update `backend/src/lib/prisma.ts` — use globalThis caching pattern
 
-## Step 2: Install dependencies
-- [x] `npm install` in root (React + Vite frontend)
-- [x] `npm install` in `backend/` (Express + Prisma backend)
-- [x] Generate Prisma client
+## Step 2: Add Graceful Shutdown Hooks
+- [x] Update `backend/src/server.ts` — add SIGTERM/SIGINT handlers
 
-## Step 3: Configure environment
-- [x] Create `backend/.env` with JWT_ACCESS_SECRET, DATABASE_URL, CORS_ORIGIN
+## Step 3: Add Prisma Postinstall Script
+- [x] Update `backend/package.json` — add postinstall script
 
-## Step 4: Build & verify frontend compiles
-- [x] Run TypeScript check on root (passed)
-- [x] Run Vite build (successful - 36 modules, 173KB JS bundle)
+## Step 4: Modularize Frontend — Extract Components from App.tsx
+- [x] Create `src/components/AddPartnerForm.tsx`
+- [x] Create `src/components/PipelineList.tsx`
+- [x] Create `src/components/FollowUpQueue.tsx`
+- [x] Create `src/components/DetailPanel.tsx`
+- [x] Update `src/App.tsx` — integrate extracted components
+- [x] Create `src/types/crm.ts` — shared type definitions
+- [x] Create `src/lib/helpers.ts` — shared utility functions
 
-## Step 5: Build & verify backend compiles
-- [x] Run TypeScript check on backend (passed)
-- [x] Generate Prisma client (successful)
+## Step 5: Update Progress Files
+- [x] Update `backend/TODO.md` — mark completed items
+- [x] Update root `TODO.md` — mark completed steps
 
-## Step 6: Fix compilation errors (if any)
-- [x] No errors found - both frontend and backend compile cleanly
-
-## Step 7: Commit and push to GitHub
-- [x] Commit: `fix: project structure, install deps, backend env`
-- [x] Push to `origin/main` → https://github.com/Shivam-01-hub/CRM-project.git
-
+## Step 6: Build Verification
+- [x] TypeScript check on backend (exit code 0)
+- [x] TypeScript check on frontend (exit code 0)
+- [x] Vite build for frontend (41 modules, 174KB JS, exit code 0)
+- [x] Prisma client generates successfully (client importable)
