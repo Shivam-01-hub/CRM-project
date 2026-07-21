@@ -12,8 +12,9 @@ async function start() {
   try {
     await assertDatabaseConnection();
 
-    app.listen(env.PORT, () => {
-      console.log(`Partnership CRM API running on http://localhost:${env.PORT}`);
+    const port = Number(process.env.PORT) || 4000;
+    app.listen(port, () => {
+      console.log(`Partnership CRM API running on http://localhost:${port}`);
     });
   } catch (error) {
 

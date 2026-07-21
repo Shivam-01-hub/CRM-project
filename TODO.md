@@ -1,15 +1,28 @@
-# TODO - Partnership CRM
+# Progress Tracker
 
-## Backend
-- [x] Add centralized error handling middleware (normalize Zod/Prisma/JWT errors; consistent JSON error shape).
+## Step 1: Clean up project structure
+- [x] Remove redundant `frontend/` directory (already gone)
 
-- [ ] Refactor auth, organizations, reminders routes to rely on error middleware (remove repetitive try/catch where safe).
-- [ ] (Next after error middleware) Implement organizations endpoints with Prisma + zod validation.
-- [ ] (Next after organizations) Implement reminders endpoints with Prisma + business rules.
-- [ ] Verify API path alignment between frontend and backend (`/api` proxy + server route mounts).
-- [ ] Improve Prisma client lifecycle + graceful shutdown.
+## Step 2: Install dependencies
+- [ ] `npm install` in root (React + Vite frontend)
+- [ ] `npm install` in `backend/` (Express + Prisma backend)
 
-## Frontend
-- [ ] Modularize API layer by domain (auth/organizations/reminders) once backend endpoints are completed.
-- [ ] Replace local-only organization state with API-backed calls incrementally.
+## Step 3: Configure environment
+- [ ] Create `backend/.env` with JWT_ACCESS_SECRET, DATABASE_URL, CORS_ORIGIN
+
+## Step 4: Build & verify frontend compiles
+- [ ] Run TypeScript check on root
+- [ ] Run Vite build
+
+## Step 5: Build & verify backend compiles
+- [ ] Run TypeScript check on backend
+- [ ] Generate Prisma client
+
+## Step 6: Fix compilation errors (if any)
+- [ ] Fix any TypeScript/build errors
+
+## Step 7: Commit and push to GitHub
+- [ ] Stage all changes
+- [ ] Commit with message
+- [ ] Push to origin
 
