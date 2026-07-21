@@ -28,5 +28,5 @@ export const createId = () =>
     ? crypto.randomUUID()
     : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
-export const today = new Date().toISOString();
+export const getToday = () => new Date().toISOString();
 

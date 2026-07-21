@@ -20,7 +20,6 @@ type DetailPanelProps = {
   onReminderMessageChange: (value: string) => void;
   onSaveReminder: () => void;
   onCompleteReminder: () => void;
-  onSelectOrganization: (id: string) => void;
 };
 
 export function DetailPanel({

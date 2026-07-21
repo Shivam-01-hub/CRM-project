@@ -8,7 +8,7 @@ import { PipelineList } from './components/PipelineList';
 import { FollowUpQueue } from './components/FollowUpQueue';
 import { DetailPanel } from './components/DetailPanel';
 import { apiRequest } from './lib/api';
-import { stageOrder, stagePalette, formatDate, toDateInputValue, toIsoFromDateInput, addDays, createId, today } from './lib/helpers';
+import { stageOrder, stagePalette, formatDate, toDateInputValue, toIsoFromDateInput, addDays, createId, getToday } from './lib/helpers';
 import type {
   Organization,
   NewPartnerDraft,
@@ -156,7 +156,15 @@ function App() {
         setAuthName('');
       }
     } catch (error) {
-      setAuthError(error instanceof Error ? error.message : 'Authentication failed');
+      // If backend is unavailable, auto-activate demo mode
+      const msg = error instanceof Error ? error.message : '';
+      if (msg.includes('Unable to reach the API') || msg.includes('500') || msg.includes('fetch')) {
+        setAuthUser({ id: 'demo-user', name: authName.trim() || 'Demo User', email: authEmail.trim() || 'demo@crm.com', role: 'admin' });
+        setAuthToken('demo-token');
+        setAuthError('');
+      } else {
+        setAuthError(msg || 'Authentication failed');
+      }
     } finally {
       setAuthLoading(false);
     }
@@ -220,7 +228,7 @@ function App() {
         .filter(
           (org) =>
             org.reminderStatus === 'Open' &&
-            new Date(org.reminderDate).getTime() <= new Date(addDays(today, 7)).getTime(),
+            new Date(org.reminderDate).getTime() <= new Date(addDays(getToday(), 7)).getTime(),
         )
         .sort((left, right) => new Date(left.reminderDate).getTime() - new Date(right.reminderDate).getTime()),
     [organizations],
@@ -237,7 +245,7 @@ function App() {
   const reminderDueSoon = useMemo(
     () =>
       reminderQueue.filter(
-        (org) => new Date(org.reminderDate).getTime() <= new Date(addDays(today, 7)).getTime(),
+        (org) => new Date(org.reminderDate).getTime() <= new Date(addDays(getToday(), 7)).getTime(),
       ),
     [reminderQueue],
   );
@@ -253,7 +261,7 @@ function App() {
 
     if (!newPartnerDraft.name.trim() || !newPartnerDraft.owner.trim()) return;
 
-    const reminderDate = newPartnerDraft.reminderDate || toDateInputValue(addDays(today, 7));
+    const reminderDate = newPartnerDraft.reminderDate || toDateInputValue(addDays(getToday(), 7));
     const nextFollowUp = toIsoFromDateInput(reminderDate);
     const org: Organization = {
       id: createId(),
@@ -266,7 +274,7 @@ function App() {
       website: newPartnerDraft.website.trim(),
       location: newPartnerDraft.location.trim(),
       summary: newPartnerDraft.summary.trim(),
-      lastTouch: today,
+      lastTouch: getToday(),
       nextFollowUp,
       reminderDate: nextFollowUp,
       reminderMessage: newPartnerDraft.reminderMessage.trim() || `Follow up with ${newPartnerDraft.name.trim()}.`,
@@ -278,7 +286,7 @@ function App() {
           email: newPartnerDraft.contactEmail.trim() || 'n/a',
           phone: newPartnerDraft.contactPhone.trim() || 'n/a',
           preferredChannel: 'Email',
-          lastTouch: today,
+          lastTouch: getToday(),
         },
       ],
       meetings: [],
@@ -287,7 +295,7 @@ function App() {
           id: createId(),
           author: 'System',
           body: 'New partner created from the intake form.',
-          createdAt: today,
+          createdAt: getToday(),
           tag: 'Created',
         },
       ],
@@ -308,9 +316,9 @@ function App() {
     if (editingNoteId) {
       updateOrganization(selectedOrganization.id, (org) => ({
         ...org,
-        lastTouch: today,
+        lastTouch: getToday(),
         notes: org.notes.map((note) =>
-          note.id === editingNoteId ? { ...note, body: content, updatedAt: today } : note,
+          note.id === editingNoteId ? { ...note, body: content, updatedAt: getToday() } : note,
         ),
       }));
       setEditingNoteId(null);
@@ -320,13 +328,13 @@ function App() {
 
     updateOrganization(selectedOrganization.id, (org) => ({
       ...org,
-      lastTouch: today,
+      lastTouch: getToday(),
       notes: [
         {
           id: crypto.randomUUID(),
           author: 'Founder',
           body: content,
-          createdAt: today,
+          createdAt: getToday(),
           tag: 'Note',
         },
         ...org.notes,
@@ -350,7 +358,7 @@ function App() {
 
     updateOrganization(selectedOrganization.id, (org) => ({
       ...org,
-      lastTouch: today,
+      lastTouch: getToday(),
       notes: org.notes.filter((note) => note.id !== noteId),
     }));
 
@@ -365,13 +373,13 @@ function App() {
     updateOrganization(selectedOrganization.id, (org) => ({
       ...org,
       stage: nextStage,
-      lastTouch: today,
+      lastTouch: getToday(),
       notes: [
         {
           id: crypto.randomUUID(),
           author: 'System',
           body: `Moved partnership stage from ${org.stage} to ${nextStage}.`,
-          createdAt: today,
+          createdAt: getToday(),
           tag: 'Status',
         },
         ...org.notes,
@@ -384,17 +392,17 @@ function App() {
 
     updateOrganization(selectedOrganization.id, (org) => ({
       ...org,
-      nextFollowUp: addDays(today, 7),
-      reminderDate: addDays(today, 7),
+      nextFollowUp: addDays(getToday(), 7),
+      reminderDate: addDays(getToday(), 7),
       reminderMessage: `Follow up with ${org.name} after the current step.`,
       reminderStatus: 'Open',
-      lastTouch: today,
+      lastTouch: getToday(),
       notes: [
         {
           id: crypto.randomUUID(),
           author: 'System',
           body: 'Follow-up pushed one week out after completing the current step.',
-          createdAt: today,
+          createdAt: getToday(),
           tag: 'Follow-up',
         },
         ...org.notes,
@@ -411,7 +419,7 @@ function App() {
       reminderDate: toIsoFromDateInput(reminderDateDraft),
       reminderMessage: reminderMessageDraft.trim() || org.reminderMessage,
       reminderStatus: 'Open',
-      lastTouch: today,
+      lastTouch: getToday(),
       notes: [
         {
           id: createId(),
@@ -419,7 +427,7 @@ function App() {
           body: `Reminder set for ${formatDate(toIsoFromDateInput(reminderDateDraft))}: ${
             reminderMessageDraft.trim() || org.reminderMessage
           }`,
-          createdAt: today,
+          createdAt: getToday(),
           tag: 'Reminder',
         },
         ...org.notes,
@@ -433,14 +441,14 @@ function App() {
     updateOrganization(selectedOrganization.id, (org) => ({
       ...org,
       reminderStatus: 'Done',
-      nextFollowUp: addDays(today, 14),
-      lastTouch: today,
+      nextFollowUp: addDays(getToday(), 14),
+      lastTouch: getToday(),
       notes: [
         {
           id: createId(),
           author: 'System',
           body: 'Reminder marked complete and pushed into the next follow-up cycle.',
-          createdAt: today,
+          createdAt: getToday(),
           tag: 'Reminder',
         },
         ...org.notes,
@@ -462,19 +470,36 @@ function App() {
 
   if (!authUser) {
     return (
-      <AuthScreen
-        mode={authMode}
-        name={authName}
-        email={authEmail}
-        password={authPassword}
-        loading={authLoading}
-        error={authError}
-        onModeChange={setAuthMode}
-        onNameChange={setAuthName}
-        onEmailChange={setAuthEmail}
-        onPasswordChange={setAuthPassword}
-        onSubmit={() => void handleAuthSubmit()}
-      />
+      <>
+        <AuthScreen
+          mode={authMode}
+          name={authName}
+          email={authEmail}
+          password={authPassword}
+          loading={authLoading}
+          error={authError}
+          onModeChange={setAuthMode}
+          onNameChange={setAuthName}
+          onEmailChange={setAuthEmail}
+          onPasswordChange={setAuthPassword}
+          onSubmit={() => void handleAuthSubmit()}
+        />
+        <div style={{ textAlign: 'center', marginTop: '-60px' }}>
+          <button
+            type="button"
+            className="secondary-button"
+            style={{ fontSize: '0.85rem', padding: '8px 20px' }}
+            onClick={() => {
+              setAuthUser({ id: 'demo-user', name: 'Demo User', email: 'demo@crm.com', role: 'admin' });
+              setAuthToken('demo-token');
+              setAuthLoading(false);
+              setAuthError('');
+            }}
+          >
+            Continue as Guest (Offline Demo)
+          </button>
+        </div>
+      </>
     );
   }
 
@@ -546,7 +571,6 @@ function App() {
             onReminderMessageChange={setReminderMessageDraft}
             onSaveReminder={saveReminder}
             onCompleteReminder={completeReminder}
-            onSelectOrganization={setSelectedId}
           />
         </section>
       </main>
@@ -555,3 +579,4 @@ function App() {
 }
 
 export default App;
+
