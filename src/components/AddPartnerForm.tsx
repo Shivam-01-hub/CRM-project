@@ -1,6 +1,6 @@
 import { type FormEvent } from 'react';
 import type { NewPartnerDraft, OrganizationType, Priority } from '../types/crm';
-import { toDateInputValue, addDays, today } from '../lib/helpers';
+import { toDateInputValue, addDays, getToday } from '../lib/helpers';
 
 type AddPartnerFormProps = {
   draft: NewPartnerDraft;
@@ -174,7 +174,7 @@ export function createDefaultNewPartnerDraft(): NewPartnerDraft {
     contactRole: '',
     contactEmail: '',
     contactPhone: '',
-    reminderDate: toDateInputValue(addDays(today, 7)),
+    reminderDate: toDateInputValue(addDays(getToday(), 7)),
     reminderMessage: 'Send an intro email and confirm the first partnership call.',
   };
 }
