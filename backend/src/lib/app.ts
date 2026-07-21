@@ -20,6 +20,20 @@ export function createApp() {
   );
   app.use(express.json());
 
+  app.get('/', (_request, response) => {
+    response.json({
+      service: 'Partnership CRM API',
+      status: 'running',
+      version: '0.1.0',
+      docs: {
+        health: '/health',
+        auth: '/auth (login, signup, me)',
+        organizations: '/organizations',
+        reminders: '/reminders',
+      },
+    });
+  });
+
   app.get('/health', (_request, response) => {
     response.json({ status: 'ok' });
   });
